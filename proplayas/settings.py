@@ -19,6 +19,7 @@ from os import getenv, path
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 import dotenv
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -58,8 +59,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'djoser',
-    'storages'
+    'storages',
     'users',
+    'books',
     
 
 ]
@@ -101,11 +103,16 @@ WSGI_APPLICATION = 'proplayas.wsgi.application'
 
 if DEVELOPMENT_MODE is True:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'proplayas',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
+}
+
 elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
     if getenv('DATABASE_URL', None) is None:
         raise Exception('DATABASE_URL environment variable not defined')
@@ -166,7 +173,7 @@ if DEVELOPMENT_MODE is True:
     STATIC_URL = 'static/'
     STATIC_ROOT = BASE_DIR / 'static'
     MEDIA_URL = 'media/'
-    MEDIA_ROOT = BASE_DIR / 'media' 
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 else:
     AWS_S3_ACCESS_KEY_ID = getenv('AWS_S3_ACCESS_KEY_ID')
     AWS_S3_SECRET_ACCESS_KEY = getenv('AWS_S3_SECRET_ACCESS_KEY')
@@ -188,6 +195,7 @@ else:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'users.authentication.CustomJWTAuthentication',
+
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
